@@ -10,15 +10,37 @@ async function main() {
   const client = new MongoClient(url);
   await client.connect();
 
-  const results = await circulationRepo.loadData(data);
+  try {
+    const results = await circulationRepo.loadData(data);
+    assert.equal(data.length, results.insertedCount);
 
-  const admin = client.db(dbName).admin();
-  
-  assert.equal(data.length, results.insertedCount);
+    const getData = await circulationRepo.get();
+    assert.equal(data.length, getData.length);
 
-  // console.log(results.insertedCount, results.ops);
-  // console.log(await admin.serverStatus());
-  // console.log(await admin.listDatabases());
+    const filterData = await circulationRepo.get({
+      Newspaper: getData[4].Newspaper,
+    });
+    assert.deepEqual(filterData[0], getData[4]);
+
+    const limitData = await circulationRepo.get({}, 3);
+    assert.equal(limitData.length, 3);
+
+    const id = getData[4]._id.toString();
+    const byId = await circulationRepo.getById(id);
+    assert.deepEqual(byId, getData[4]);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    const admin = client.db(dbName).admin();
+
+    // Drop database
+    await client.db(dbName).dropDatabase();
+
+    console.log(await admin.listDatabases());
+
+    // Close connection
+    client.close();
+  }
 }
 
 main();
