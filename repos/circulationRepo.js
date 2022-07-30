@@ -60,7 +60,22 @@ function circulationRepo() {
     });
   }
 
-  return { loadData, get, getById };
+  function add(item) {
+    return new Promise(async (resolve, reject) => {
+      const client = new MongoClient(url);
+      try {
+        await client.connect();
+        const db = client.db(dbName);
+        const addedItem = await db.collection("newspapers").insertOne(item);
+        resolve(addedItem);
+        client.close();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  return { loadData, get, getById, add };
 }
 
 module.exports = circulationRepo();
