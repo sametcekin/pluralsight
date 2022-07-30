@@ -43,6 +43,28 @@ async function main() {
 
     const addedItemQuery = await circulationRepo.getById(addedItem.insertedId);
     assert.deepEqual(addedItemQuery, newItem);
+
+    console.log(addedItem.insertedId);
+
+    var updateItemValue = {
+      "Newspaper": "My new paper",
+      "Daily Circulation, 2004": 1,
+      "Daily Circulation, 2013": 2,
+      "Change in Daily Circulation, 2004-2013": 100,
+      "Pulitzer Prize Winners and Finalists, 1990-2003": 0,
+      "Pulitzer Prize Winners and Finalists, 2004-2014": 0,
+      "Pulitzer Prize Winners and Finalists, 1990-2014": 0,
+    };
+    const updatedItem = await circulationRepo.update(
+      addedItem.insertedId,
+      updateItemValue
+    );
+    assert.equal(updatedItem.Newspaper, "My new paper");
+
+    const newAddedItemQuery = await circulationRepo.getById(
+      addedItem.insertedId
+    );
+    assert.equal(newAddedItemQuery.Newspaper, "My new paper");
   } catch (error) {
     console.log(error);
   } finally {
@@ -50,8 +72,6 @@ async function main() {
 
     // Drop database
     await client.db(dbName).dropDatabase();
-
-    console.log(await admin.listDatabases());
 
     // Close connection
     client.close();
