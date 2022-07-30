@@ -66,6 +66,9 @@ async function main() {
 
     const removed = await circulationRepo.remove(addedItem.insertedId);
     assert(removed);
+
+    const deletedItem = await circulationRepo.getById(addedItem.insertedId);
+    assert.equal(deletedItem, null);
   } catch (error) {
     console.log(error);
   } finally {
