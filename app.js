@@ -44,8 +44,6 @@ async function main() {
     const addedItemQuery = await circulationRepo.getById(addedItem.insertedId);
     assert.deepEqual(addedItemQuery, newItem);
 
-    console.log(addedItem.insertedId);
-
     var updateItemValue = {
       "Newspaper": "My new paper",
       "Daily Circulation, 2004": 1,
@@ -65,6 +63,9 @@ async function main() {
       addedItem.insertedId
     );
     assert.equal(newAddedItemQuery.Newspaper, "My new paper");
+
+    const removed = await circulationRepo.remove(addedItem.insertedId);
+    assert(removed);
   } catch (error) {
     console.log(error);
   } finally {
